@@ -1,0 +1,18 @@
+{
+  "singleQuote": true,
+  "useTabs": true,
+  "printWidth": 120,
+  "tabWidth": 4,
+  "trailingComma": "none",
+  "arrowParens": "avoid",
+  "endOfLine": "lf",
+  "overrides": [
+    {
+      "files": ["*.json", "*.yaml", ".eslintrc", ".prettierrc"],
+      "options": {
+        "useTabs": false,
+        "tabWidth": 2
+      }
+    }
+  ]
+}
