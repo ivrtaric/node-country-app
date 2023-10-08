@@ -1,9 +1,10 @@
 import type { Request, Response } from 'express';
+import { handleErrorsWrapper } from 'src/middleware/error-handler';
 
-export const addNeighbours = (req: Request, res: Response) => {
+export const addNeighbours = handleErrorsWrapper(async (req: Request, res: Response) => {
 	res.json({});
-};
+});
 
-export const removeNeighbour = (req: Request, res: Response) => {
+export const removeNeighbour = handleErrorsWrapper(async (req: Request, res: Response) => {
 	res.json({});
-};
+});
