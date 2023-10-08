@@ -11,6 +11,7 @@ import {
 	updateCountry
 } from 'src/api/routes/countries';
 import { calculateOptimalRoute } from 'src/api/routes/calculations';
+import { handleErrorsWrapper as errSafe } from 'src/api/middleware/error-handler';
 
 export const router = express.Router();
 
@@ -20,12 +21,12 @@ router.use(bodyParser.urlencoded({ extended: true }));
 
 router
 	.get('/', (req, res) => res.send('Echo'))
-	.get('/countries', getCountries)
-	.get('/countries/:id', getCountryById)
-	.post('/countries', createCountry)
-	.put('/countries/:id', updateCountry)
-	.patch('/countries/:id', updateCountry)
-	.delete('/countries/:id', deleteCountry)
-	.post('/countries/:id/neighbours', addNeighbours)
-	.delete('/countries/:id/neighbours/:neighbourId', removeNeighbour)
-	.get('/calculate/optimal-route', calculateOptimalRoute);
+	.get('/countries', errSafe(getCountries))
+	.get('/countries/:id', errSafe(getCountryById))
+	.post('/countries', errSafe(createCountry))
+	.put('/countries/:id', errSafe(updateCountry))
+	.patch('/countries/:id', errSafe(updateCountry))
+	.delete('/countries/:id', errSafe(deleteCountry))
+	.post('/countries/:id/neighbours', errSafe(addNeighbours))
+	.delete('/countries/:id/neighbours/:neighbourId', errSafe(removeNeighbour))
+	.get('/calculate/optimal-route', errSafe(calculateOptimalRoute));
