@@ -10,7 +10,7 @@ export class PgClient {
 	) {}
 
 	async disconnect() {
-		await this.pool.end();
+		return this.pool.end();
 	}
 
 	async query<T extends object, U>(func: (...args: U[]) => string, ...args: U[]): Promise<Array<T>> {
@@ -27,6 +27,7 @@ export class PgClient {
 			query = func(...args);
 			logger.trace(name, query);
 			data = (await client.query(query)).rows;
+			// data = (await this.pool.query(query)).rows;
 			logger.trace(name, data);
 		} catch (e) {
 			!query ? logger.error(`Failed in function:`, name) : logger.error(`Error executing query:`, query);

@@ -1,5 +1,5 @@
 export interface Country {
-	id: number;
+	id: number | bigint;
 	name: string;
 	code: string;
 	code_alpha_2: string;
@@ -8,7 +8,7 @@ export interface Country {
 }
 
 export interface Neighbour {
-	id: number;
-	country_id: number;
-	neighbour_id: number;
+	id: number | bigint;
+	country_id: number | bigint;
+	neighbour_id: number | bigint;
 }
