@@ -1,5 +1,3 @@
-import Debug from 'debug';
-
 export const enum LogLevelName {
 	ERROR = 'ERROR',
 	WARN = 'WARN',
@@ -17,9 +15,11 @@ const LogLevel = {
 
 export class Logger {
 	private logLevel: number;
-	private _debugInstance;
 
-	constructor(_loggingPrefix: string | null = null, minLogLevel?: keyof typeof LogLevel) {
+	constructor(
+		private loggingPrefix: string | null = null,
+		minLogLevel?: keyof typeof LogLevel
+	) {
 		if (minLogLevel) {
 			this.logLevel = LogLevel[minLogLevel];
 		} else {
@@ -28,44 +28,50 @@ export class Logger {
 
 			this.logLevel = isLogLevel(envLogLevel) ? LogLevel[envLogLevel] : LogLevel.INFO;
 		}
-
-		this._debugInstance = Debug(_loggingPrefix ?? `Log-${Date.now()}`);
 	}
 
 	trace(...data: unknown[]) {
 		if (this.logLevel <= 0) {
-			this._debugInstance(this.logMessage('TRACE', data).join(' '));
+			console.trace(...this.logMessage('TRACE', data));
 		}
 	}
 
 	debug(...data: unknown[]) {
 		if (this.logLevel <= 1) {
-			this._debugInstance(this.logMessage('DEBUG', data).join(' '));
+			console.debug(...this.logMessage('DEBUG', data));
 		}
 	}
 
 	info(...data: unknown[]) {
 		if (this.logLevel <= 2) {
-			this._debugInstance(this.logMessage('INFO', data).join(' '));
+			console.info(...this.logMessage('INFO', data));
 		}
 	}
 
 	warn(...data: unknown[]) {
 		if (this.logLevel <= 3) {
-			this._debugInstance(this.logMessage('WARN', data).join(' '));
+			console.warn(...this.logMessage('WARN', data));
 		}
 	}
 
 	log(...data: unknown[]) {
-		this.info(data);
+		console.log(...this.logMessage('INFO', data));
 	}
 
 	error(...data: unknown[]) {
-		this._debugInstance(this.logMessage('ERROR', data).join(' '));
+		console.error(...this.logMessage('ERROR', data));
 	}
 
 	private logMessage<T>(logLevel: keyof typeof LogLevel, data: T[]): (T | string)[] {
-		return [logLevel, String(Date.now()), ...data];
+		// prettier-ignore
+		return [
+			...([
+				new Date().toISOString(),
+				logLevel,
+				this.loggingPrefix ? `[${this.loggingPrefix}]` : null
+			].filter(x => x) as string[]),
+			...data
+		];
 	}
 }
 
