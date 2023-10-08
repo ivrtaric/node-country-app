@@ -9,7 +9,7 @@ const _EnvFiles = {
 type EnvFiles = keyof typeof _EnvFiles;
 
 const nodeEnv: EnvFiles = (process.env.NODE_ENV as EnvFiles) ?? 'production';
-const parsedEnv = dotenv.config({ debug: true, path: _EnvFiles[nodeEnv] ?? _EnvFiles.production });
+const parsedEnv = dotenv.config({ path: _EnvFiles[nodeEnv] ?? _EnvFiles.production });
 
 const env = cleanEnv(parsedEnv.parsed ?? process.env, {
 	PORT: num({ default: 3000 }),

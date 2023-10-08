@@ -7,7 +7,10 @@
     "start": "npx ts-node ./src/index.ts",
     "start:local": "NODE_ENV=development npx ts-node ./src/index.ts",
     "lint": "npx eslint . --ext .ts",
-    "test": "npx mocha --config ./test/.mocharc.json"
+    "test:integration": "npm run pretest && npm run test:integration:run ; npm run posttest",
+    "pretest": "dotenv -e ./.env.test -- docker compose -f ./test/compose.yml up -d",
+    "posttest": "dotenv -e ./.env.test -- docker compose -f ./test/compose.yml down && docker volume prune -f --filter all=1",
+    "test:integration:run": "NODE_ENV=test npx mocha --config ./test/.mocharc.json"
   },
   "keywords": [],
   "author": "Ivan Vrtarić",
@@ -36,6 +39,7 @@
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
     "chai": "^4.3.10",
+    "chai-http": "^4.4.0",
     "eslint": "^8.51.0",
     "mocha": "^10.2.0",
     "prettier": "^3.0.3",
