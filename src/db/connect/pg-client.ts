@@ -13,7 +13,7 @@ export class PgClient {
 		await this.pool.end();
 	}
 
-	async query<T extends object>(func: (...args: unknown[]) => string, ...args: unknown[]): Promise<Array<T>> {
+	async query<T extends object, U>(func: (...args: U[]) => string, ...args: U[]): Promise<Array<T>> {
 		const start = Date.now();
 		const name = func.name;
 		let data: T[] = [];
@@ -42,11 +42,8 @@ export class PgClient {
 		return data ?? [];
 	}
 
-	async queryNamed<T extends object>(
-		func: (...args: unknown[]) => string,
-		...args: unknown[]
-	): Promise<QueryResult<T>> {
-		const data = await this.query<T>(func, ...args);
+	async queryNamed<T extends object, U>(func: (...args: U[]) => string, ...args: U[]): Promise<QueryResult<T>> {
+		const data = await this.query<T, U>(func, ...args);
 
 		return {
 			[this.getPropertyName(func.name)]: data ?? []

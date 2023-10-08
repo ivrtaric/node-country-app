@@ -12,7 +12,7 @@ const logger = new Logger('app');
 const app = express();
 app.use(env.BASE_PATH, router);
 const server = app.listen(env.PORT, async () => {
-	logger.log(`Server is running at http://localhost:${env.PORT}`);
+	logger.log(`Server is running at http://localhost:${env.PORT}${env.BASE_PATH}`);
 });
 
 async function gracefulShutdown() {

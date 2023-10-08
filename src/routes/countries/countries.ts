@@ -1,29 +1,14 @@
 import type { Request, Response } from 'express';
+import { getCountries as appGetCountries, getCountryById as appGetCountryById } from 'src/app/countries';
 
-export const getCountries = (req: Request, res: Response) => {
-	res.json([
-		{
-			id: 1,
-			name: 'United States',
-			code: 'USA',
-			code_alpha_2: 'US',
-			code_alpha_3: 'USA',
-			flag: 'us_flag.png'
-		},
-		{
-			id: 2,
-			name: 'Canada',
-			code: 'CAN',
-			code_alpha_2: 'CA',
-			code_alpha_3: 'CAN',
-			flag: 'canada_flag.png'
-		}
-		// More countries...
-	]);
+export const getCountries = async (req: Request, res: Response) => {
+	const countries = await appGetCountries();
+	res.json(countries);
 };
 
-export const getCountryById = (req: Request, res: Response) => {
-	res.json({});
+export const getCountryById = async (req: Request, res: Response) => {
+	const country = await appGetCountryById(Number(req.params.id));
+	res.json(country);
 };
 
 export const createCountry = (req: Request, res: Response) => {
