@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
-import { getCountries as appGetCountries, getCountryById as appGetCountryById } from 'src/app/countries';
+import { getCountries as appGetCountries, getCountryById as appGetCountryById } from 'src/application/countries';
 import { Logger } from 'src/util/logger';
-import { handleErrorsWrapper } from 'src/middleware/error-handler';
+import { handleErrorsWrapper } from 'src/api/middleware/error-handler';
 
 const logger = new Logger('routes:countries');
 

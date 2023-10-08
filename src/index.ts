@@ -1,12 +1,12 @@
 import 'app-module-path/cwd';
 import express from 'express';
 
-import { router } from 'src/routes';
+import { errorHandler } from 'src/api/middleware/error-handler';
+import { router } from 'src/api/routes';
+import { getClient } from 'src/db/connect';
 import { Logger } from 'src/util/logger';
 
 import env from './env';
-import { getClient } from 'src/db/connect';
-import { errorHandler } from 'src/middleware/error-handler';
 
 const logger = new Logger('app');
 

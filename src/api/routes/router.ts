@@ -9,8 +9,8 @@ import {
 	getCountryById,
 	removeNeighbour,
 	updateCountry
-} from 'src/routes/countries';
-import { calculateOptimalRoute } from 'src/routes/calculations';
+} from 'src/api/routes/countries';
+import { calculateOptimalRoute } from 'src/api/routes/calculations';
 
 export const router = express.Router();
 
