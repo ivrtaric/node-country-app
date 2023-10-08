@@ -1,16 +1,33 @@
 import 'app-module-path/cwd';
 import express from 'express';
-import * as dotenv from 'dotenv';
 
 import { router } from 'src/routes';
+import { Logger } from 'src/util/logger';
 
-dotenv.config();
+import env from './env';
+import { getClient } from 'src/db/connect';
 
-const { PORT = 3000, BASE_PATH = '/' } = process.env;
+const logger = new Logger('app');
 
 const app = express();
+app.use(env.BASE_PATH, router);
+const server = app.listen(env.PORT, async () => {
+	logger.log(`Server is running at http://localhost:${env.PORT}`);
+});
 
-app.use(BASE_PATH, router);
-app.listen(PORT, () => {
-	console.log(`[server]: Server is running at http://localhost:${PORT}`);
+async function gracefulShutdown() {
+	const dbClient = await getClient();
+	await dbClient.disconnect();
+	server.close(() => {
+		logger.log(`Server closing`);
+	});
+}
+
+process.on('SIGTERM', async () => {
+	logger.log(`SIGTERM received`);
+	await gracefulShutdown();
+});
+process.on('SIGINT', async () => {
+	logger.log(`SIGINT received`);
+	await gracefulShutdown();
 });

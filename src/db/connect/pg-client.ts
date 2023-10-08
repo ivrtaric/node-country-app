@@ -1,31 +1,16 @@
-import { Pool } from 'pg';
+import { Pool, PoolClient } from 'pg';
 import { Logger } from 'src/util/logger';
 
-const logger = new Logger('db-connect');
-
-export const connectPool = async () =>
-	new Pool({
-		max: Number(process.env.DB_MAX_CONNECTIONS) || 5,
-		...(await getConnectionDetails())
-	});
-
-export const getConnectionDetails = async () => {
-	const { DB_CONFIG = '{}' } = process.env;
-	const config = JSON.parse(DB_CONFIG);
-	return {
-		...config,
-		port: typeof config.port == 'string' ? Number(config.port) : config.port
-	};
-};
+const logger = new Logger('pg-client');
 
 export class PgClient {
-	pool: Pool;
-
 	constructor(
-		pool: Pool,
-		private _catchErrors: boolean = true
-	) {
-		this.pool = pool;
+		private pool: Pool,
+		private squashErrors = false
+	) {}
+
+	async disconnect() {
+		await this.pool.end();
 	}
 
 	async query<T extends object>(func: (...args: unknown[]) => string, ...args: unknown[]): Promise<Array<T>> {
@@ -33,8 +18,12 @@ export class PgClient {
 		const name = func.name;
 		let data: T[] = [];
 		let query: string | undefined = undefined;
-		const client = await this.pool.connect();
+
+		let client: PoolClient | undefined = undefined;
 		try {
+			logger.debug('Opening a connection to DB...');
+			client = await this.pool.connect();
+
 			query = func(...args);
 			logger.trace(name, query);
 			data = (await client.query(query)).rows;
@@ -42,12 +31,12 @@ export class PgClient {
 		} catch (e) {
 			!query ? logger.error(`Failed in function:`, name) : logger.error(`Error executing query:`, query);
 			logger.error(e);
-			if (!this._catchErrors) {
+			if (!this.squashErrors) {
 				throw e;
 			}
 		} finally {
 			logger.info(`${name}, ${Date.now() - start}ms`);
-			client.release();
+			client?.release();
 		}
 
 		return data ?? [];
@@ -57,21 +46,24 @@ export class PgClient {
 		func: (...args: unknown[]) => string,
 		...args: unknown[]
 	): Promise<QueryResult<T>> {
-		const name = func.name;
 		const data = await this.query<T>(func, ...args);
 
 		return {
-			[this.removeStringBeforeFirstUpperChar(name)]: data ?? []
+			[this.getPropertyName(func.name)]: data ?? []
 		};
 	}
 
-	private removeStringBeforeFirstUpperChar(functionName: string): string {
-		const replaced = functionName.replace(/^[a-z]+/, '');
+	/**
+	 * Returns the name of the property in which the query results will be stored.
+	 * The logic removes all non-uppercase characters from the functionName, and
+	 * then lowercases the first uppercase character in the remaining string.
+	 * @example getPropertyName('psqlGetCountries') => 'getCountries'
+	 * @param functionName
+	 * @private
+	 */
+	private getPropertyName(functionName: string): string {
+		const replaced = functionName.replace(/^[^A-Z]+/, '');
 		return replaced.charAt(0).toLowerCase() + replaced.slice(1);
-	}
-
-	set catchErrors(value: boolean) {
-		this._catchErrors = value;
 	}
 }
 
