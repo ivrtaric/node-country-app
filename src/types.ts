@@ -6,9 +6,10 @@ export interface CreateCountryData {
 	flag?: string | null;
 }
 
-export type UpdateCountryData = Partial<CreateCountryData>;
+export type PutCountryData = CreateCountryData;
+export type PatchCountryData = Partial<PutCountryData>;
 
-export interface Country extends CreateCountryData {
+export interface Country {
 	id: number | bigint;
 	name: string;
 	code: string;

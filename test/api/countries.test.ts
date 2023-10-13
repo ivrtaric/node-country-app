@@ -29,7 +29,7 @@ after(async () => {
 });
 
 describe('GET /countries', () => {
-	it('it should GET all the countries', async () => {
+	it('should GET all the countries', async () => {
 		const res = await chai.request(serverUrl).get('/countries');
 
 		expect(res.status).to.equal(200);
@@ -58,7 +58,17 @@ describe('GET /countries', () => {
 });
 
 describe('GET /countries/:id', () => {
-	it('it should GET a single country', async () => {
+	it('should reference country by a number ID', async () => {
+		const res = await chai.request(serverUrl).get('/countries/usa');
+
+		expect(res.status).to.equal(400);
+		expect(res.body).to.deep.equal({
+			message: ['Invalid country ID: Expected a positive integer, got "usa"'],
+			status: 400
+		});
+	});
+
+	it('should GET a single country', async () => {
 		const res = await chai.request(serverUrl).get('/countries/1');
 
 		expect(res.status).to.equal(200);
@@ -74,8 +84,169 @@ describe('GET /countries/:id', () => {
 		});
 	});
 
-	it('it should return 404 for non-existant country', async () => {
+	it('should return HTTP 404 for non-existent country', async () => {
 		const res = await chai.request(serverUrl).get('/countries/20');
+
+		expect(res.status).to.equal(404);
+		expect(res.body).to.be.an('object');
+		expect(res.body).to.deep.equal({
+			status: 404,
+			message: ['Not found: Country {"id":20}']
+		});
+	});
+});
+
+describe('POST /countries', () => {
+	const validData = {
+		name: 'France',
+		code: 'FRA',
+		code_alpha_2: 'FR',
+		code_alpha_3: 'FRA',
+		flag: 'france_flag.png'
+	};
+
+	it('should create a new country', async () => {
+		// prettier-ignore
+		const res = await chai.request(serverUrl)
+			.post('/countries')
+			.set('Content-Type', 'application/json')
+			.send(validData);
+
+		expect(res.status).to.equal(201);
+		expect(res.body).to.be.an('object');
+		expect(res.body).to.deep.equal({
+			id: 3,
+			...validData
+		});
+	});
+
+	it('should return HTTP 400 for invalid data', async () => {
+		// prettier-ignore
+		const res = await chai.request(serverUrl)
+			.post('/countries')
+			.set('Content-Type', 'application/json')
+			.send({
+				...validData,
+				code: 12345, // Invalid data type
+				code_alpha_2: true // Invalid data type
+			});
+
+		expect(res.status).to.equal(400);
+		expect(res.body).to.deep.equal({
+			status: 400,
+			message: [
+				'Invalid country data: code - Expected string, received number: 12345',
+				'Invalid country data: code_alpha_2 - Expected string, received boolean: true'
+			]
+		});
+	});
+
+	it('should return HTTP 400 for incomplete data', async () => {
+		// prettier-ignore
+		const res = await chai.request(serverUrl)
+			.post('/countries')
+			.set('Content-Type', 'application/json')
+			.send({
+				name: 'France'
+			});
+
+		expect(res.status).to.equal(400);
+		expect(res.body).to.deep.equal({
+			status: 400,
+			message: [
+				'Invalid country data: Missing required property: code',
+				'Invalid country data: Missing required property: code_alpha_2',
+				'Invalid country data: Missing required property: code_alpha_3'
+			]
+		});
+	});
+});
+
+describe('PUT /countries/:id', () => {
+	const validData = {
+		name: 'New France',
+		code: 'NFR',
+		code_alpha_2: 'NF',
+		code_alpha_3: 'NFR',
+		flag: 'new_france_flag.png'
+	};
+
+	it('should reference country by a number ID', async () => {
+		const res = await chai
+			.request(serverUrl)
+			.put('/countries/usa')
+			.set('Content-Type', 'application/json')
+			.send(validData);
+
+		expect(res.status).to.equal(400);
+		expect(res.body).to.deep.equal({
+			message: ['Invalid country ID: Expected a positive integer, got "usa"'],
+			status: 400
+		});
+	});
+
+	it('should update an existing country', async () => {
+		// prettier-ignore
+		const res = await chai.request(serverUrl)
+			.put('/countries/3')
+			.set('Content-Type', 'application/json')
+			.send(validData);
+
+		expect(res.status).to.equal(200);
+		expect(res.body).to.be.an('object');
+		expect(res.body).to.deep.equal({
+			id: 3,
+			...validData
+		});
+	});
+
+	it('should return HTTP 400 for invalid data', async () => {
+		const res = await chai
+			.request(serverUrl)
+			.put('/countries/3')
+			.set('Content-Type', 'application/json')
+			.send({
+				...validData,
+				code: 12345, // Invalid data type
+				code_alpha_2: true // Invalid data type
+			});
+
+		expect(res.status).to.equal(400);
+		expect(res.body).to.deep.equal({
+			status: 400,
+			message: [
+				'Invalid country data: code - Expected string, received number: 12345',
+				'Invalid country data: code_alpha_2 - Expected string, received boolean: true'
+			]
+		});
+	});
+
+	it('should return HTTP 400 for incomplete data', async () => {
+		// prettier-ignore
+		const res = await chai.request(serverUrl)
+			.put('/countries/3')
+			.set('Content-Type', 'application/json')
+			.send({
+				name: 'New New France'
+			});
+
+		expect(res.status).to.equal(400);
+		expect(res.body).to.deep.equal({
+			status: 400,
+			message: [
+				'Invalid country data: Missing required property: code',
+				'Invalid country data: Missing required property: code_alpha_2',
+				'Invalid country data: Missing required property: code_alpha_3'
+			]
+		});
+	});
+
+	it('should return HTTP 404 for non-existent country data', async () => {
+		// prettier-ignore
+		const res = await chai.request(serverUrl)
+			.put('/countries/20')
+			.set('Content-Type', 'application/json')
+			.send(validData);
 
 		expect(res.status).to.equal(404);
 		expect(res.body).to.be.an('object');
@@ -86,32 +257,121 @@ describe('GET /countries/:id', () => {
 	});
 });
 
-describe('POST /countries', () => {
-	it('it should create a new country', async () => {
-		// const res = await chai.request(serverUrl).post('/countries');
-		//
-		// expect(res.status).to.equal(200);
-		// expect(res.body).to.be.an('object');
-		//
-		// expect(res.body).to.deep.equal({
-		// 	id: 1,
-		// 	name: 'United States',
-		// 	code: 'USA',
-		// 	code_alpha_2: 'US',
-		// 	code_alpha_3: 'USA',
-		// 	flag: 'us_flag.png'
-		// });
+describe('PATCH /countries/:id', () => {
+	const validData = {
+		name: 'New France',
+		code: 'NFR',
+		code_alpha_2: 'NF',
+		code_alpha_3: 'NFR',
+		flag: 'new_france_flag.png'
+	};
+
+	it('should reference country by a number ID', async () => {
+		const res = await chai
+			.request(serverUrl)
+			.put('/countries/usa')
+			.set('Content-Type', 'application/json')
+			.send(validData);
+
+		expect(res.status).to.equal(400);
+		expect(res.body).to.deep.equal({
+			message: ['Invalid country ID: Expected a positive integer, got "usa"'],
+			status: 400
+		});
+	});
+
+	it('should update an existing country', async () => {
+		// prettier-ignore
+		const res = await chai.request(serverUrl)
+			.patch('/countries/3')
+			.set('Content-Type', 'application/json')
+			.send(validData);
+
+		expect(res.status).to.equal(200);
+		expect(res.body).to.be.an('object');
+		expect(res.body).to.deep.equal({
+			id: 3,
+			...validData
+		});
+	});
+
+	it('should return HTTP 404 for non-existent country data', async () => {
+		// prettier-ignore
+		const res = await chai.request(serverUrl)
+			.patch('/countries/20')
+			.set('Content-Type', 'application/json')
+			.send(validData);
+
+		expect(res.status).to.equal(404);
+		expect(res.body).to.be.an('object');
+		expect(res.body).to.deep.equal({
+			status: 404,
+			message: 'Not found: Country {"id":20}'
+		});
+	});
+
+	it('should return HTTP 400 for invalid data', async () => {
+		const res = await chai
+			.request(serverUrl)
+			.patch('/countries/3')
+			.set('Content-Type', 'application/json')
+			.send({
+				...validData,
+				code: 12345, // Invalid data type
+				code_alpha_2: true // Invalid data type
+			});
+
+		expect(res.status).to.equal(400);
+	});
+
+	it('should return HTTP 200 for incomplete data', async () => {
+		// prettier-ignore
+		const res = await chai.request(serverUrl)
+			.patch('/countries/3')
+			.set('Content-Type', 'application/json')
+			.send({
+				name: 'New New France'
+			});
+
+		expect(res.status).to.equal(200);
+		expect(res.body).to.be.an('object');
+		expect(res.body).to.deep.equal({
+			id: 3,
+			...validData,
+			name: 'New New France'
+		});
 	});
 });
 
-describe('PUT /countries/:id', () => {
-	//
-});
-
-describe('PATCH /countries/:id', () => {
-	//
-});
-
 describe('DELETE /countries/:id', () => {
-	//
+	it('should reference country by a number ID', async () => {
+		const res = await chai.request(serverUrl).delete('/countries/usa');
+
+		expect(res.status).to.equal(400);
+		expect(res.body).to.deep.equal({
+			message: ['Invalid country ID: Expected a positive integer, got "usa"'],
+			status: 400
+		});
+	});
+
+	it('should DELETE a single country', async () => {
+		const res = await chai.request(serverUrl).delete('/countries/3');
+
+		expect(res.status).to.equal(200);
+		expect(res.body).to.be.an('object');
+		expect(res.body).to.deep.equal({
+			message: 'Successfully deleted Country {"id":3}'
+		});
+	});
+
+	it('should return HTTP 404 for non-existent country', async () => {
+		const res = await chai.request(serverUrl).delete('/countries/20');
+
+		expect(res.status).to.equal(404);
+		expect(res.body).to.be.an('object');
+		expect(res.body).to.deep.equal({
+			status: 404,
+			message: 'Not found: Country {"id":20}'
+		});
+	});
 });

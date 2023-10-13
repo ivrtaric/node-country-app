@@ -1,7 +1,21 @@
 import type { NextFunction, Request, Response } from 'express';
-import { getCountries as appGetCountries, getCountryById as appGetCountryById } from 'src/application/countries';
+import {
+	createCountry as appCreateCountry,
+	getCountries as appGetCountries,
+	getCountryById as appGetCountryById,
+	updateCountry as appUpdateCountry
+} from 'src/application/countries';
+import {
+	countryDataValidatorErrorMap,
+	numberIdValidator,
+	numberIdValidatorErrorMap,
+	partialCountryDataValidator,
+	requiredCountryDataValidator
+} from 'src/api/validate';
+import { CreateCountryData, PatchCountryData, PutCountryData } from 'src/types';
+import { Logger } from 'src/util/logger';
 
-// const logger = new Logger('routes:countries');
+const logger = new Logger('routes:countries');
 
 export const getCountries = async (req: Request, res: Response, next: NextFunction) => {
 	const countries = await appGetCountries();
@@ -9,18 +23,55 @@ export const getCountries = async (req: Request, res: Response, next: NextFuncti
 };
 
 export const getCountryById = async (req: Request, res: Response, next: NextFunction) => {
-	const country = await appGetCountryById(Number(req.params.id));
+	const countryId = validateCountryId(req);
+	const country = await appGetCountryById(countryId);
 	res.json(country);
 };
 
 export const createCountry = async (req: Request, res: Response) => {
-	res.json({});
+	const countryData = validateCountryData(req);
+
+	const country = await appCreateCountry(countryData as CreateCountryData);
+
+	res.json(country);
 };
 
-export const updateCountry = async (req: Request, res: Response) => {
-	res.json({});
+export const updateCountryComplete = async (req: Request, res: Response) => {
+	const countryId = validateCountryId(req);
+	const countryData = validateCountryData(req);
+
+	const country = await appUpdateCountry(countryId, countryData as PutCountryData);
+
+	res.json(country);
+};
+
+export const updateCountryPartial = async (req: Request, res: Response) => {
+	const countryId = validateCountryId(req);
+	const countryData = validateCountryData(req, true);
+
+	const country = await appUpdateCountry(countryId, countryData as PatchCountryData);
+
+	res.json(country);
 };
 
 export const deleteCountry = (req: Request, res: Response) => {
+	const countryId = validateCountryId(req);
+
 	res.json({});
+};
+
+const validateCountryId = (req: Request) => {
+	const { id } = numberIdValidator.parse(req.params, {
+		errorMap: numberIdValidatorErrorMap(req.params.id, 'Invalid country ID')
+	});
+
+	return id;
+};
+
+const validateCountryData = (req: Request, partial = false) => {
+	const data = (partial ? partialCountryDataValidator : requiredCountryDataValidator).parse(req.body, {
+		errorMap: countryDataValidatorErrorMap('Invalid country data')
+	});
+
+	return data;
 };

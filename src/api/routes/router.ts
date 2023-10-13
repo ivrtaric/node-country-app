@@ -8,7 +8,8 @@ import {
 	getCountries,
 	getCountryById,
 	removeNeighbour,
-	updateCountry
+	updateCountryComplete,
+	updateCountryPartial
 } from 'src/api/routes/countries';
 import { calculateOptimalRoute } from 'src/api/routes/calculations';
 import { handleErrorsWrapper as errSafe } from 'src/api/middleware/error-handler';
@@ -24,8 +25,8 @@ router
 	.get('/countries', errSafe(getCountries))
 	.get('/countries/:id', errSafe(getCountryById))
 	.post('/countries', errSafe(createCountry))
-	.put('/countries/:id', errSafe(updateCountry))
-	.patch('/countries/:id', errSafe(updateCountry))
+	.put('/countries/:id', errSafe(updateCountryComplete))
+	.patch('/countries/:id', errSafe(updateCountryPartial))
 	.delete('/countries/:id', errSafe(deleteCountry))
 	.post('/countries/:id/neighbours', errSafe(addNeighbours))
 	.delete('/countries/:id/neighbours/:neighbourId', errSafe(removeNeighbour))
