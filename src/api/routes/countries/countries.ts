@@ -1,17 +1,12 @@
 import type { NextFunction, Request, Response } from 'express';
 import {
 	createCountry as appCreateCountry,
+	deleteCountry as appDeleteCountry,
 	getCountries as appGetCountries,
 	getCountryById as appGetCountryById,
 	updateCountry as appUpdateCountry
 } from 'src/application/countries';
-import {
-	countryDataValidatorErrorMap,
-	numberIdValidator,
-	numberIdValidatorErrorMap,
-	partialCountryDataValidator,
-	requiredCountryDataValidator
-} from 'src/api/validate';
+import { validateCountryData, validateCountryId } from 'src/api/validate';
 import { CreateCountryData, PatchCountryData, PutCountryData } from 'src/types';
 import { Logger } from 'src/util/logger';
 
@@ -33,7 +28,7 @@ export const createCountry = async (req: Request, res: Response) => {
 
 	const country = await appCreateCountry(countryData as CreateCountryData);
 
-	res.json(country);
+	res.status(201).json(country);
 };
 
 export const updateCountryComplete = async (req: Request, res: Response) => {
@@ -54,24 +49,10 @@ export const updateCountryPartial = async (req: Request, res: Response) => {
 	res.json(country);
 };
 
-export const deleteCountry = (req: Request, res: Response) => {
+export const deleteCountry = async (req: Request, res: Response) => {
 	const countryId = validateCountryId(req);
 
-	res.json({});
-};
+	const country = await appDeleteCountry(countryId);
 
-const validateCountryId = (req: Request) => {
-	const { id } = numberIdValidator.parse(req.params, {
-		errorMap: numberIdValidatorErrorMap(req.params.id, 'Invalid country ID')
-	});
-
-	return id;
-};
-
-const validateCountryData = (req: Request, partial = false) => {
-	const data = (partial ? partialCountryDataValidator : requiredCountryDataValidator).parse(req.body, {
-		errorMap: countryDataValidatorErrorMap('Invalid country data')
-	});
-
-	return data;
+	res.json(country);
 };

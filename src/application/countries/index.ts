@@ -30,27 +30,27 @@ export const createCountry = async (countryData: CreateCountryData) => {
 	const pgClient = await getClient();
 
 	const results = await dbCreateCountry(pgClient, countryData);
-	return results ?? null;
+	return results?.length ? results[0] : null;
 };
 
 export const updateCountry = async (countryId: number, countryData: PutCountryData | PatchCountryData) => {
 	const pgClient = await getClient();
 
 	const results = await dbUpdateCountry(pgClient, countryId, countryData);
-	if (results?.length) {
-		return results[0];
-	} else {
+	if (!results?.length) {
 		throw new NotFoundError('Country', { id: countryId });
 	}
+
+	return results[0];
 };
 
 export const deleteCountry = async (countryId: number) => {
 	const pgClient = await getClient();
 
 	const results = await dbDeleteCountry(pgClient, countryId);
-	if (results?.length) {
-		return results[0];
-	} else {
+	if (!results?.length) {
 		throw new NotFoundError('Country', { id: countryId });
 	}
+
+	return { message: `Successfully deleted Country ${JSON.stringify({ id: countryId })}` };
 };

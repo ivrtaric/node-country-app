@@ -1,31 +1,21 @@
 import 'app-module-path/cwd';
 import chai, { expect } from 'chai';
 import chaiHttp from 'chai-http';
-import { Server } from 'http';
 import * as path from 'path';
-
-import { start } from 'src/app';
 import env from 'src/env';
-import { gracefulShutdown } from 'src/util/server';
 
 import { runSqlFile } from 'test/util';
+import format from 'pg-format';
+import { NotFoundError } from 'src/errors';
+import { getClient } from 'src/db/connect';
 
 chai.use(chaiHttp);
-
-let server: Server;
 
 const serverUrl = `http://localhost:${env.PORT}${env.BASE_PATH}`;
 
 before(async () => {
 	await runSqlFile(path.join(__dirname, '..', '..', 'src', 'db', 'schema', '00-schema.sql'));
 	await runSqlFile(path.join(__dirname, '..', 'fixtures', 'db-data.sql'));
-
-	const appValues = start();
-	server = appValues.server;
-});
-
-after(async () => {
-	await gracefulShutdown(server);
 });
 
 describe('GET /countries', () => {
@@ -118,6 +108,13 @@ describe('POST /countries', () => {
 			id: 3,
 			...validData
 		});
+
+		const newCountry = await getCountry(3);
+		expect(newCountry).to.be.an('object');
+		expect(newCountry).to.deep.equal({
+			id: 3,
+			...validData
+		});
 	});
 
 	it('should return HTTP 400 for invalid data', async () => {
@@ -198,6 +195,13 @@ describe('PUT /countries/:id', () => {
 			id: 3,
 			...validData
 		});
+
+		const newCountry = await getCountry(3);
+		expect(newCountry).to.be.an('object');
+		expect(newCountry).to.deep.equal({
+			id: 3,
+			...validData
+		});
 	});
 
 	it('should return HTTP 400 for invalid data', async () => {
@@ -252,7 +256,7 @@ describe('PUT /countries/:id', () => {
 		expect(res.body).to.be.an('object');
 		expect(res.body).to.deep.equal({
 			status: 404,
-			message: 'Not found: Country {"id":20}'
+			message: ['Not found: Country {"id":20}']
 		});
 	});
 });
@@ -275,8 +279,8 @@ describe('PATCH /countries/:id', () => {
 
 		expect(res.status).to.equal(400);
 		expect(res.body).to.deep.equal({
-			message: ['Invalid country ID: Expected a positive integer, got "usa"'],
-			status: 400
+			status: 400,
+			message: ['Invalid country ID: Expected a positive integer, got "usa"']
 		});
 	});
 
@@ -293,6 +297,13 @@ describe('PATCH /countries/:id', () => {
 			id: 3,
 			...validData
 		});
+
+		const newCountry = await getCountry(3);
+		expect(newCountry).to.be.an('object');
+		expect(newCountry).to.deep.equal({
+			id: 3,
+			...validData
+		});
 	});
 
 	it('should return HTTP 404 for non-existent country data', async () => {
@@ -306,7 +317,7 @@ describe('PATCH /countries/:id', () => {
 		expect(res.body).to.be.an('object');
 		expect(res.body).to.deep.equal({
 			status: 404,
-			message: 'Not found: Country {"id":20}'
+			message: ['Not found: Country {"id":20}']
 		});
 	});
 
@@ -324,7 +335,7 @@ describe('PATCH /countries/:id', () => {
 		expect(res.status).to.equal(400);
 	});
 
-	it('should return HTTP 200 for incomplete data', async () => {
+	it('should update target record with incomplete data', async () => {
 		// prettier-ignore
 		const res = await chai.request(serverUrl)
 			.patch('/countries/3')
@@ -340,6 +351,14 @@ describe('PATCH /countries/:id', () => {
 			...validData,
 			name: 'New New France'
 		});
+
+		const newCountry = await getCountry(3);
+		expect(newCountry).to.be.an('object');
+		expect(newCountry).to.deep.equal({
+			id: 3,
+			...validData,
+			name: 'New New France'
+		});
 	});
 });
 
@@ -349,8 +368,8 @@ describe('DELETE /countries/:id', () => {
 
 		expect(res.status).to.equal(400);
 		expect(res.body).to.deep.equal({
-			message: ['Invalid country ID: Expected a positive integer, got "usa"'],
-			status: 400
+			status: 400,
+			message: ['Invalid country ID: Expected a positive integer, got "usa"']
 		});
 	});
 
@@ -371,7 +390,17 @@ describe('DELETE /countries/:id', () => {
 		expect(res.body).to.be.an('object');
 		expect(res.body).to.deep.equal({
 			status: 404,
-			message: 'Not found: Country {"id":20}'
+			message: ['Not found: Country {"id":20}']
 		});
 	});
 });
+
+const getCountry = async (id: number) => {
+	const client = await getClient();
+	const results = await client.query(format(`SELECT * FROM country WHERE id = %1$L`, id));
+	if (!results?.length) {
+		throw new NotFoundError('Country', { id });
+	}
+
+	return results[0];
+};
