@@ -19,7 +19,9 @@ export const getCountries = async (req: Request, res: Response, next: NextFuncti
 
 export const getCountryById = async (req: Request, res: Response, next: NextFunction) => {
 	const countryId = validateCountryId(req);
+
 	const country = await appGetCountryById(countryId);
+
 	res.json(country);
 };
 

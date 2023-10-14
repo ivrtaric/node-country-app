@@ -1,10 +1,10 @@
 import * as z from 'zod';
 import { Request } from 'express';
-import { numberIdValidator, numberIdValidatorErrorMap } from 'src/api/validate/index';
+import { numberIdValidator, numberIdValidatorErrorMap } from 'src/api/validate';
 
 export const validateCountryId = (req: Request) => {
 	const { id } = numberIdValidator.parse(req.params, {
-		errorMap: numberIdValidatorErrorMap(req.params.id, 'Invalid country ID')
+		errorMap: numberIdValidatorErrorMap('Invalid country ID', req.params.id)
 	});
 
 	return id;

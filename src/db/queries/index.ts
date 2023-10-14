@@ -1,6 +1,9 @@
 import format from 'pg-format';
 import { CreateCountryData, PatchCountryData, PutCountryData } from 'src/types';
 
+export const psqlCheckExistingCountries = (countryIds: Array<number>) =>
+	format(`SELECT id FROM country WHERE id IN (%1$L)`, countryIds);
+
 export const pgsqlGetCountries = () => format(`SELECT * FROM country`);
 
 export const pgsqlGetCountryById = (id: number | bigint) => format(`SELECT * FROM country WHERE id = %1$L`, id);
@@ -30,3 +33,14 @@ export const pgsqlUpdateCountryById = (id: number | bigint, countryData: PutCoun
 
 export const pgsqlDeleteCountryById = (id: number | bigint) =>
 	format(`DELETE FROM country WHERE id = %1$L RETURNING *`, id);
+
+export const pgsqlAddNeighbours = (countryId: number, neighbourIds: Array<number>) => {
+	const values = neighbourIds.map(neighbourId => format(`(%1$L, %2$L)`, countryId, neighbourId));
+
+	return format(`
+		INSERT INTO neighbours(country_id, neighbour_id)
+		VALUES ${values.join(', ')}
+		ON CONFLICT DO NOTHING
+		RETURNING *
+	`);
+};

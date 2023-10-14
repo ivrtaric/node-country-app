@@ -1,5 +1,9 @@
 import * as childProcess from 'child_process';
 
+import env from 'src/env';
+
+export const SERVER_URL = `http://localhost:${env.PORT}${env.BASE_PATH}`;
+
 export const execute = (script: string) =>
 	new Promise((resolve, reject) => {
 		const child = childProcess.exec(script);

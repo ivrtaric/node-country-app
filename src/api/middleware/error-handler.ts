@@ -14,6 +14,9 @@ export const errorHandler = (error: Error, request: Request, response: Response,
 		response.status(status).send({ status, message: error.issues.map(i => i.message) });
 	} else {
 		const status = error instanceof HttpStatusError ? error.status : 500;
+		if (status === 500) {
+			logger.error(error.stack);
+		}
 		response.status(status).send({ status, message: [error.message] });
 	}
 };
