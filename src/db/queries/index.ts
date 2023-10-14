@@ -1,7 +1,7 @@
 import format from 'pg-format';
 import { CreateCountryData, PatchCountryData, PutCountryData } from 'src/types';
 
-export const psqlCheckExistingCountries = (countryIds: Array<number>) =>
+export const psqlCheckExistingCountries = (countryIds: Array<number | bigint>) =>
 	format(`SELECT id FROM country WHERE id IN (%1$L)`, countryIds);
 
 export const pgsqlGetCountries = () => format(`SELECT * FROM country`);
@@ -31,10 +31,13 @@ export const pgsqlUpdateCountryById = (id: number | bigint, countryData: PutCoun
 	return format(`UPDATE country SET ${updateFields.join(', ')} WHERE id = %1$L RETURNING *`, id);
 };
 
-export const pgsqlDeleteCountryById = (id: number | bigint) =>
+export const pgsqlDeleteCountryById = (id: number | bigint): string =>
 	format(`DELETE FROM country WHERE id = %1$L RETURNING *`, id);
 
-export const pgsqlAddNeighbours = (countryId: number, neighbourIds: Array<number>) => {
+export const psqlGetNeighbour = (countryId: number | bigint, neighbourId: number | bigint) =>
+	format(`SELECT * FROM neighbours WHERE country_id = %1$L AND neighbour_id = %2$L`, countryId, neighbourId);
+
+export const pgsqlAddNeighbours = (countryId: number | bigint, neighbourIds: Array<number | bigint>): string => {
 	const values = neighbourIds.map(neighbourId => format(`(%1$L, %2$L)`, countryId, neighbourId));
 
 	return format(`
@@ -44,3 +47,15 @@ export const pgsqlAddNeighbours = (countryId: number, neighbourIds: Array<number
 		RETURNING *
 	`);
 };
+
+export const pgsqlRemoveNeighbour = (countryId: number | bigint, neighbourId: number | bigint) =>
+	format(
+		`
+		DELETE FROM neighbours
+		WHERE country_id = %1$L
+		  AND neighbour_id = %2$L
+		RETURNING *
+	`,
+		countryId,
+		neighbourId
+	);

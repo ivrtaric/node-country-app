@@ -112,15 +112,52 @@ describe('Neighbours', () => {
 
 	describe('DELETE /countries/:id/neighbours/:neighbourId', () => {
 		it('should remove the neighbour relation', async () => {
-			//
+			const neighboursBefore = await getNeighbours(1);
+			expect(neighboursBefore).to.include(2);
+
+			const res = await chai.request(SERVER_URL).delete('/countries/1/neighbours/2');
+
+			expect(res.status).to.equal(200);
+			expect(res.body).to.be.an('object');
+			expect(res.body).to.deep.equal({
+				message: 'Neighbour with ID 2 has been removed successfully'
+			});
+
+			const neighboursAfter = await getNeighbours(1);
+			expect(neighboursAfter).not.to.include(2);
 		});
 
 		it('should return HTTP 404 if the target country does not exist', async () => {
-			//
+			const res = await chai.request(SERVER_URL).delete('/countries/20/neighbours/2');
+
+			expect(res.status).to.equal(404);
+			expect(res.body).to.be.an('object');
+			expect(res.body).to.deep.equal({
+				status: 404,
+				message: ['Not found: Country {"id":20}']
+			});
 		});
 
-		it('should return HTTP 404 if the target neighbour does not exist', async () => {
-			//
+		it('should return HTTP 404 if the target neighbour country does not exist', async () => {
+			const res = await chai.request(SERVER_URL).delete('/countries/1/neighbours/20');
+
+			expect(res.status).to.equal(404);
+			expect(res.body).to.be.an('object');
+			expect(res.body).to.deep.equal({
+				status: 404,
+				message: ['Not found: Country {"id":20}']
+			});
+		});
+
+		it('should return HTTP 404 if the target neighbour is not a neighbour', async () => {
+			const res = await chai.request(SERVER_URL).delete('/countries/1/neighbours/6');
+
+			expect(res.status).to.equal(404);
+			expect(res.body).to.be.an('object');
+			expect(res.body).to.deep.equal({
+				status: 404,
+				message: ['Not found: Neighbour {"id":6}']
+			});
 		});
 	});
 
