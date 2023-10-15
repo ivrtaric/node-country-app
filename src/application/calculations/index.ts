@@ -1,4 +1,5 @@
 import { Worker } from 'node:worker_threads';
+import * as path from 'node:path';
 
 import { getClient } from 'src/db/connect';
 import { getRecursiveNeighbours } from 'src/db/functions';
@@ -17,8 +18,9 @@ export const calculateOptimalRoute = async (start: number, end: number) => {
 		return []; // Ending country has no neighbours
 	}
 
+	const workerRunnerPath = path.join(__dirname, 'run-worker.js');
 	return new Promise((resolve, reject) => {
-		const worker = new Worker('./run-worker.js', {
+		const worker = new Worker(workerRunnerPath, {
 			workerData: {
 				start,
 				end,

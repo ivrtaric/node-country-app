@@ -1,11 +1,15 @@
 import * as z from 'zod';
 
+export * from './calculations';
 export * from './countries';
 export * from './neighbours';
 
-export const positiveIntValidator = z.number().int().positive();
-
-export const numberIdValidator = z.object({ id: z.string().transform(Number).pipe(positiveIntValidator) });
+// prettier-ignore
+export const numberIdValidator = z.object({
+	id: z.string().transform(Number).pipe(
+		z.number().int().positive()
+	)
+});
 
 export const numberIdValidatorErrorMap =
 	(customMessage?: string, value?: unknown): z.ZodErrorMap =>
