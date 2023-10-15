@@ -13,12 +13,14 @@ import {
 } from 'src/api/routes/countries';
 import { calculateOptimalRoute } from 'src/api/routes/calculations';
 import { handleErrorsWrapper as errSafe } from 'src/api/middleware/error-handler';
+import { requestLogger } from 'src/api/middleware/request-logger';
 
 export const router = express.Router();
 
 router.use(cors());
 router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
+router.use(requestLogger);
 
 router
 	.get('/', (req, res) => res.send('Echo'))

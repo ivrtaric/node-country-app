@@ -58,8 +58,6 @@ export function dijkstraShortestPath(
 		countryFrom = unvisitedNodes[0];
 	}
 
-	console.log({ distances, previous });
-
 	const shortestPath = [];
 	let previousNode: number | bigint | undefined = end;
 	for (;;) {
