@@ -5,6 +5,7 @@ import {
 	pgsqlDeleteCountryById,
 	pgsqlGetCountries,
 	pgsqlGetCountryById,
+	pgsqlGetRecursiveNeighbours,
 	pgsqlRemoveNeighbour,
 	pgsqlUpdateCountryById,
 	psqlCheckExistingCountries,
@@ -49,3 +50,9 @@ export const removeNeighbour = (
 	countryId: number | bigint,
 	neighbourId: number | bigint
 ): Promise<Array<Neighbour>> => client.query<Neighbour>(pgsqlRemoveNeighbour(countryId, neighbourId));
+
+export const getRecursiveNeighbours = async (
+	client: PgClient,
+	start: number | bigint,
+	end: number | bigint
+): Promise<Array<Neighbour>> => client.query<Neighbour>(pgsqlGetRecursiveNeighbours(start, end));

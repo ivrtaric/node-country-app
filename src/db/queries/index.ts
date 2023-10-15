@@ -59,3 +59,20 @@ export const pgsqlRemoveNeighbour = (countryId: number | bigint, neighbourId: nu
 		countryId,
 		neighbourId
 	);
+
+export const pgsqlGetRecursiveNeighbours = (start: number | bigint, end: number | bigint) =>
+	format(
+		`
+		WITH RECURSIVE graph AS (
+			SELECT n.country_id, n.neighbour_id FROM neighbours n WHERE n.country_id = %1$L
+		UNION 
+			SELECT n.country_id, n.neighbour_id
+			FROM neighbours n
+				INNER JOIN graph g ON n.country_id = g.neighbour_id
+			WHERE n.country_id <> %2$L
+		)
+		SELECT * FROM graph
+	`,
+		start,
+		end
+	);
