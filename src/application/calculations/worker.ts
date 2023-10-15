@@ -1,10 +1,21 @@
-import { parentPort, workerData } from 'worker_threads';
+import 'app-module-path/cwd';
+import { parentPort } from 'worker_threads';
+
 import type { Neighbour } from 'src/types';
-import type { WorkerData } from '.';
+import type { WorkerMessage } from './types';
+
+parentPort?.on('message', (data: WorkerMessage) => {
+	const { start, end, graph } = data ?? {};
+	parentPort?.postMessage(dijkstraShortestPath(start, end, graph));
+});
 
 export type WeightedNeighbour = Omit<Neighbour, 'id'> & { weight?: number };
 
-export function dijkstraShortestPath(start: number, end: number, graph: Array<WeightedNeighbour>) {
+export function dijkstraShortestPath(
+	start: number | bigint,
+	end: number | bigint,
+	graph: Array<WeightedNeighbour>
+): Array<number | bigint> {
 	if (!graph?.length) {
 		return []; // Starting country has no neighbours
 	}
@@ -13,11 +24,6 @@ export function dijkstraShortestPath(start: number, end: number, graph: Array<We
 	if (!endingPoints?.length) {
 		return []; // Ending country has no neighbours
 	}
-
-	// This is a special case for no-weight graphs (i.e. weight for all edges = 1)
-	// if (graph.find(n => n.country_id === start && n.neighbour_id === end)) {
-	// 	return [start, end]; // Countries are directly connected
-	// }
 
 	const visited = new Set<number | bigint>();
 	const distances = new Map<number | bigint, number>();
@@ -67,6 +73,3 @@ export function dijkstraShortestPath(start: number, end: number, graph: Array<We
 
 	return shortestPath;
 }
-
-const { start, end, graph } = (workerData ?? {}) as WorkerData;
-parentPort?.postMessage(dijkstraShortestPath(start, end, graph));

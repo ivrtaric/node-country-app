@@ -1,4 +1,6 @@
 import * as dotenv from 'dotenv';
+import * as os from 'os';
+
 import { cleanEnv, json, num, str } from 'envalid';
 
 const _EnvFiles = {
@@ -20,7 +22,8 @@ const env = cleanEnv(parsedEnv.parsed ?? process.env, {
 	DB_CONFIG: json({ desc: 'Additional email parameters' }),
 	DB_POOL_SIZE: num({ default: 5 }),
 
-	NODE_ENV: str({ choices: ['development', 'test', 'production', 'staging'], default: 'production' })
+	NODE_ENV: str({ choices: ['development', 'test', 'production', 'staging'], default: 'production' }),
+	WORKERS: num({ default: os.cpus().length })
 });
 
 export default env;

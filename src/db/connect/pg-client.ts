@@ -10,7 +10,8 @@ export class PgClient {
 	) {}
 
 	async disconnect() {
-		return this.pool.end();
+		logger.info('Disconnecting from database...');
+		return this.pool.end().then(() => logger.info('Disconnected.'));
 	}
 
 	async query<T extends object>(sqlQuery: string): Promise<Array<T>> {
