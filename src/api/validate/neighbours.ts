@@ -19,7 +19,7 @@ const addNeighboursValidator = z
 
 export const validateAddNeighboursData = (req: Request) => {
 	const { neighbour_ids } = addNeighboursValidator.parse(req.body, {
-		errorMap: numberIdValidatorErrorMap('Invalid country ID')
+		errorMap: numberIdValidatorErrorMap('Invalid neighbour IDs array')
 	});
 
 	return neighbour_ids;

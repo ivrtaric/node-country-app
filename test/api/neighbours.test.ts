@@ -79,9 +79,9 @@ describe('Neighbours', () => {
 			expect(res.body).to.deep.equal({
 				status: 400,
 				message: [
-					'Invalid country ID: Expected a positive integer, got "string"',
-					'Invalid country ID: Expected a positive integer, got "string"',
-					'Invalid country ID: Expected a positive integer, got "string"'
+					'Invalid neighbour IDs array: Expected a positive integer, got "string"',
+					'Invalid neighbour IDs array: Expected a positive integer, got "string"',
+					'Invalid neighbour IDs array: Expected a positive integer, got "string"'
 				]
 			});
 		});
@@ -90,9 +90,10 @@ describe('Neighbours', () => {
 			// prettier-ignore
 			[
 				['{ neighbour_ids: [] }', { neighbour_ids: [] }, 'Neighbour IDS array must not be empty'],
-				['{ neighbour_ids: null }', { neighbour_ids: null }, 'Invalid country ID: Expected a positive integer, got "null"'],
-				['{ neighbour_ids: undefined }', { neighbour_ids: undefined }, 'Invalid country ID: Expected a positive integer, got "undefined"'],
-				['{}', {}, 'Invalid country ID: Expected a positive integer, got "undefined"']
+				['{ neighbour_ids: null }', { neighbour_ids: null }, 'Invalid neighbour IDs array: Expected a positive integer, got "null"'],
+				['{ neighbour_ids: undefined }', { neighbour_ids: undefined }, 'Invalid neighbour IDs array: Expected a positive integer, got "undefined"'],
+				['{ country_ids: [2, 3, 4] }', { country_ids: [2, 3, 4] }, 'Invalid neighbour IDs array: Expected a positive integer, got "undefined"'],
+				['{}', {}, 'Invalid neighbour IDs array: Expected a positive integer, got "undefined"']
 			].map(([testCase, incompletePayload, expectedMessage]) =>
 				it(`should return HTTP 400 for ${testCase}`, async () => {
 					const res = await chai.request(SERVER_URL)

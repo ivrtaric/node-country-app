@@ -5,7 +5,7 @@ export * from './neighbours';
 
 export const positiveIntValidator = z.number().int().positive();
 
-export const numberIdValidator = z.object({ id: z.coerce.number().int().positive() });
+export const numberIdValidator = z.object({ id: z.string().transform(Number).pipe(positiveIntValidator) });
 
 export const numberIdValidatorErrorMap =
 	(customMessage?: string, value?: unknown): z.ZodErrorMap =>
