@@ -18,6 +18,7 @@ INSERT INTO neighbours (country_id, neighbour_id)
 SELECT c.id, n.id
 FROM country c, country n
 WHERE (c."name" = 'France' AND n."name" IN ('Germany', 'Spain'))
+   OR (c."name" = 'Germany' AND n."name" IN ('France'))
    OR (c."name" = 'Canada' AND n."name" IN ('United States'))
    OR (c."name" = 'United States' AND n."name" IN ('Canada', 'Mexico'))
 ON CONFLICT DO NOTHING;

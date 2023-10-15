@@ -6,7 +6,7 @@ import { calculateOptimalRoute as appCalculateOptimalRoute } from 'src/applicati
 export const calculateOptimalRoute = async (req: Request, res: Response) => {
 	const { source_country_id, target_country_id } = optimalRouteParameterValidator.parse(req.query);
 
-	const response = await appCalculateOptimalRoute(source_country_id, target_country_id);
+	const optimal_route = await appCalculateOptimalRoute(source_country_id, target_country_id);
 
-	res.json({ response });
+	res.json({ source_country_id, target_country_id, optimal_route });
 };
