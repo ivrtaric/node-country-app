@@ -9,50 +9,97 @@ chai.use(chaiHttp);
 
 describe('Neighbours', () => {
 	before(async () => {
-		await runSqlFile(path.join(__dirname, '..', '..', 'src', 'db', 'schema', '00-schema.sql'));
-		await runSqlFile(path.join(__dirname, '..', 'fixtures', 'db-data-neighbours-api.sql'));
+		await runSqlFile(path.join(__dirname, '..', 'fixtures', 'create-db-init.sql'));
 	});
 
 	describe('GET /calculate/optimal-route', () => {
-		it('should calculate the optimal route for connected countries', async () => {
-			const res = await chai
-				.request(SERVER_URL)
-				.get('/calculate/optimal-route?source_country_id=2&target_country_id=7');
+		describe('Optimal routes', () => {
+			it('between Portugal and Finland', async () => {
+				const res = await chai
+					.request(SERVER_URL)
+					.get('/calculate/optimal-route?source_country_id=170&target_country_id=71');
 
-			expect(res.status).to.equal(200);
-			expect(res.body).to.be.an('object');
-			expect(res.body).to.deep.equals({
-				source_country_id: 2,
-				target_country_id: 7,
-				optimal_route: [2, 1, 7]
+				expect(res.status).to.equal(200);
+				expect(res.body).to.be.an('object');
+				expect(res.body).to.deep.equals({
+					source_country_id: 170,
+					target_country_id: 71,
+					optimal_route: [170, 197, 72, 79, 169, 175, 71]
+				});
+			});
+
+			it('between Albania and Algeria', async () => {
+				const res = await chai
+					.request(SERVER_URL)
+					.get('/calculate/optimal-route?source_country_id=1&target_country_id=2');
+
+				expect(res.status).to.equal(200);
+				expect(res.body).to.be.an('object');
+				expect(res.body).to.deep.equals({
+					source_country_id: 1,
+					target_country_id: 2,
+					optimal_route: [1, 82, 216, 205, 103, 62, 120, 2]
+				});
+			});
+
+			it('between Albania and Andorra', async () => {
+				const res = await chai
+					.request(SERVER_URL)
+					.get('/calculate/optimal-route?source_country_id=1&target_country_id=4');
+
+				expect(res.status).to.equal(200);
+				expect(res.body).to.be.an('object');
+				expect(res.body).to.deep.equals({
+					source_country_id: 1,
+					target_country_id: 4,
+					optimal_route: [1, 186, 96, 191, 104, 72, 4]
+				});
 			});
 		});
 
-		it('should return the direct route for directly connected countries', async () => {
-			const res = await chai
-				.request(SERVER_URL)
-				.get('/calculate/optimal-route?source_country_id=1&target_country_id=2');
+		describe('Directly connected countries', () => {
+			it('between Albania and Montenegro', async () => {
+				const res = await chai
+					.request(SERVER_URL)
+					.get('/calculate/optimal-route?source_country_id=1&target_country_id=141');
 
-			expect(res.status).to.equal(200);
-			expect(res.body).to.be.an('object');
-			expect(res.body).to.deep.equals({
-				source_country_id: 1,
-				target_country_id: 2,
-				optimal_route: [1, 2]
+				expect(res.status).to.equal(200);
+				expect(res.body).to.be.an('object');
+				expect(res.body).to.deep.equals({
+					source_country_id: 1,
+					target_country_id: 141,
+					optimal_route: [1, 141]
+				});
 			});
 		});
 
-		it('should return empty array for non-connected countries', async () => {
-			const res = await chai
-				.request(SERVER_URL)
-				.get('/calculate/optimal-route?source_country_id=1&target_country_id=4');
+		describe('Disconnected countries', () => {
+			it('between American Samoa and United States', async () => {
+				const res = await chai
+					.request(SERVER_URL)
+					.get('/calculate/optimal-route?source_country_id=3&target_country_id=224');
 
-			expect(res.status).to.equal(200);
-			expect(res.body).to.be.an('object');
-			expect(res.body).to.deep.equals({
-				source_country_id: 1,
-				target_country_id: 4,
-				optimal_route: []
+				expect(res.status).to.equal(200);
+				expect(res.body).to.be.an('object');
+				expect(res.body).to.deep.equals({
+					source_country_id: 3,
+					target_country_id: 224,
+					optimal_route: []
+				});
+			});
+
+			it('between Australia and Japan', async () => {
+				const res = await chai
+					.request(SERVER_URL)
+					.get('/calculate/optimal-route?source_country_id=12&target_country_id=106');
+
+				expect(res.status).to.equal(200);
+				expect(res.body).to.be.an('object');
+				expect(res.body).to.deep.equals({
+					source_country_id: 12,
+					target_country_id: 106,
+					optimal_route: []
+				});
 			});
 		});
 	});
