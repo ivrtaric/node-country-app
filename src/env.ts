@@ -13,17 +13,20 @@ type EnvFiles = keyof typeof _EnvFiles;
 const nodeEnv: EnvFiles = (process.env.NODE_ENV as EnvFiles) ?? 'production';
 const parsedEnv = dotenv.config({ path: _EnvFiles[nodeEnv] ?? _EnvFiles.production });
 
-const env = cleanEnv(parsedEnv.parsed ?? process.env, {
-	PORT: num({ default: 3000 }),
-	BASE_PATH: str({ default: '/' }),
+const env = cleanEnv(
+	{ ...(parsedEnv.parsed ?? {}), ...process.env },
+	{
+		PORT: num({ default: 3000 }),
+		BASE_PATH: str({ default: '/' }),
 
-	LOG_LEVEL: str({ choices: ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR'], default: 'INFO' }),
+		LOG_LEVEL: str({ choices: ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR'], default: 'INFO' }),
 
-	DB_CONFIG: json({ desc: 'Additional email parameters' }),
-	DB_POOL_SIZE: num({ default: 5 }),
+		DB_CONFIG: json({ desc: 'Additional email parameters' }),
+		DB_POOL_SIZE: num({ default: 5 }),
 
-	NODE_ENV: str({ choices: ['development', 'test', 'production', 'staging'], default: 'production' }),
-	WORKERS: num({ default: os.cpus().length })
-});
+		NODE_ENV: str({ choices: ['development', 'test', 'production', 'staging'], default: 'production' }),
+		WORKERS: num({ default: os.cpus().length })
+	}
+);
 
 export default env;

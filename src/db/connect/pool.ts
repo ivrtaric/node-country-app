@@ -7,7 +7,7 @@ import { Logger } from 'src/util/logger';
 const logger = new Logger('db-connect');
 
 export const connectPool = async () => {
-	logger.info(`Connecting to database (pooling ${env.DB_POOL_SIZE} connections...)`);
+	logger.info(`Creating database connection pool (${env.DB_POOL_SIZE} connections) ...`);
 	initializeDatabaseTypeConverters();
 	return new Pool({
 		max: env.DB_POOL_SIZE,
