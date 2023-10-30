@@ -10,7 +10,7 @@ export async function gracefulShutdown(server: Server, code?: number) {
 		.then(() =>
 			server.close(() => {
 				console.log(`Server closed`);
-				process.exit((code ?? 0) + 128);
 			})
-		);
+		)
+		.finally(() => process.exit((code ?? 0) + 128));
 }

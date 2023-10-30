@@ -4,12 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx ts-node ./src/index.ts",
+    "build": "docker build -t notch-bootcamp/country-app-node --build-arg port=3003 .",
+    "start": "npx ts-node --transpile-only ./src/index.ts",
     "start:local": "NODE_ENV=development npx ts-node ./src/index.ts",
     "lint": "npx eslint . --ext .ts",
     "test:integration": "npm run pretest && npm run test:integration:run ; npm run posttest",
-    "pretest": "dotenv -e ./.env.test -- docker compose -f ./test/compose.yml up -d",
-    "posttest": "dotenv -e ./.env.test -- docker compose -f ./test/compose.yml down && docker volume prune -f --filter all=1",
+    "pretest": "npx dotenv -e ./.env.test -- docker compose -f ./test/compose.yml up -d",
+    "posttest": "npx dotenv -e ./.env.test -- docker compose -f ./test/compose.yml down && docker volume prune -f --filter all=1",
     "test:integration:run": "NODE_ENV=test npx mocha --config ./test/.mocharc.json"
   },
   "keywords": [],
@@ -19,12 +20,16 @@
     "app-module-path": "^2.2.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "dotenv-cli": "^7.3.0",
     "envalid": "^8.0.0",
     "express": "^4.18.2",
     "pg-types": "^4.0.1",
     "pg": "^8.11.3",
     "pg-format": "^1.0.4",
     "source-map-support": "^0.5.21",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.5.5",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -43,8 +48,6 @@
     "eslint": "^8.51.0",
     "mocha": "^10.2.0",
     "prettier": "^3.0.3",
-    "sinon": "^16.1.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.5.5"
+    "sinon": "^16.1.0"
   }
 }
