@@ -20,17 +20,12 @@ jobs:
         run: |
           VERSION="${{ github.event.inputs.version }}"
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
-      - name: Log in to Docker registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.DOCKER_REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: true
-          tags: ${{ format('{0}/{1}:{2}', env.DOCKER_REGISTRY, env.IMAGE_NAME, env.VERSION) }}
-          build-args: |
-            PORT=3003
+      - name: Log into Docker registry
+        run: |-
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+      - name: Build Docker image
+        run: |-
+          docker build -t $DOCKER_REGISTRY/$IMAGE_NAME:$VERSION --build-arg port=3003 .
+      - name: Push Docker image
+        run: |-
+          docker push $DOCKER_REGISTRY/$IMAGE_NAME:$VERSION
