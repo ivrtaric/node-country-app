@@ -1,0 +1,34 @@
+name: Build target version docker image
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Target version for build operation'
+        required: true
+        default: 'latest'
+env:
+  DOCKER_REGISTRY: ghcr.io
+  IMAGE_NAME: notch-bootcamp/country-app-node
+jobs:
+  pipeline:
+    name: Build and Publish docker image
+    runs-on: dev-crawl
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up version
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+      - name: Log in to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ format('{0}/{1}:{2}', env.DOCKER_REGISTRY, env.IMAGE_NAME, env.VERSION) }}
