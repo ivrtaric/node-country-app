@@ -1,5 +1,5 @@
 import { Server } from 'http';
-import { getClient } from 'src/db/connect';
+import { getClient } from 'src/db';
 import { closeWorkerPool } from 'src/application/calculations/worker-pool';
 
 export async function gracefulShutdown(server: Server, code?: number) {

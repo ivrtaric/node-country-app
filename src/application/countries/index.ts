@@ -1,24 +1,11 @@
-import { getClient } from 'src/db/connect';
-import {
-	createCountry as dbCreateCountry,
-	deleteCountryById as dbDeleteCountry,
-	getCountries as dbGetCountries,
-	getCountryById as dbGetCountryById,
-	updateCountryById as dbUpdateCountry
-} from 'src/db/functions';
 import { NotFoundError } from 'src/errors';
 import { CreateCountryData, PatchCountryData, PutCountryData } from 'src/types';
+import { getFunctions } from 'src/db';
 
-export const getCountries = async () => {
-	const pgClient = await getClient();
-
-	return dbGetCountries(pgClient);
-};
+export const getCountries = async () => getFunctions().getCountries();
 
 export const getCountryById = async (id: number) => {
-	const pgClient = await getClient();
-
-	const results = await dbGetCountryById(pgClient, id);
+	const results = await getFunctions().getCountryById(id);
 	if (results?.length) {
 		return results[0];
 	} else {
@@ -27,16 +14,12 @@ export const getCountryById = async (id: number) => {
 };
 
 export const createCountry = async (countryData: CreateCountryData) => {
-	const pgClient = await getClient();
-
-	const results = await dbCreateCountry(pgClient, countryData);
+	const results = await getFunctions().createCountry(countryData);
 	return results?.length ? results[0] : null;
 };
 
 export const updateCountry = async (countryId: number, countryData: PutCountryData | PatchCountryData) => {
-	const pgClient = await getClient();
-
-	const results = await dbUpdateCountry(pgClient, countryId, countryData);
+	const results = await getFunctions().updateCountryById(countryId, countryData);
 	if (!results?.length) {
 		throw new NotFoundError('Country', { id: countryId });
 	}
@@ -45,9 +28,7 @@ export const updateCountry = async (countryId: number, countryData: PutCountryDa
 };
 
 export const deleteCountry = async (countryId: number) => {
-	const pgClient = await getClient();
-
-	const results = await dbDeleteCountry(pgClient, countryId);
+	const results = await getFunctions().deleteCountryById(countryId);
 	if (!results?.length) {
 		throw new NotFoundError('Country', { id: countryId });
 	}

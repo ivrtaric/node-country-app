@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 import * as os from 'os';
 
-import { cleanEnv, json, num, str } from 'envalid';
+import { bool, cleanEnv, json, num, str } from 'envalid';
 
 const _EnvFiles = {
 	development: '.env.local',
@@ -31,7 +31,8 @@ const env = cleanEnv(
 		DB_NAME: str({ default: 'countryapp' }),
 
 		NODE_ENV: str({ choices: ['development', 'test', 'production', 'staging'], default: 'production' }),
-		WORKERS: num({ default: os.cpus().length })
+		WORKERS: num({ default: os.cpus().length }),
+		USE_ORM: bool({ default: false })
 	}
 );
 

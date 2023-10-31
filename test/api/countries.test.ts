@@ -4,8 +4,8 @@ import chaiHttp from 'chai-http';
 import * as path from 'path';
 import format from 'pg-format';
 
+import { getClient } from 'src/db/raw';
 import { NotFoundError } from 'src/errors';
-import { getClient } from 'src/db/connect';
 import { runSqlFile, SERVER_URL } from 'test/util';
 
 chai.use(chaiHttp);

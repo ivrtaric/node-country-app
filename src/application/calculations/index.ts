@@ -1,12 +1,9 @@
-import { getClient } from 'src/db/connect';
-import { getRecursiveNeighbours } from 'src/db/functions';
-
 import { getWorkerPool } from './worker-pool';
 import { WorkerMessage } from './types';
+import { getFunctions } from 'src/db';
 
 export const calculateOptimalRoute = async (start: number, end: number) => {
-	const pgClient = await getClient();
-	const neighbourGraphNodes = await getRecursiveNeighbours(pgClient, start, end);
+	const neighbourGraphNodes = await getFunctions().getRecursiveNeighbours(start, end);
 
 	const optimal_route = await new Promise((resolve, reject) => {
 		const task: WorkerMessage = {

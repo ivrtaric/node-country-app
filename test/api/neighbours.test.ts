@@ -3,7 +3,7 @@ import chaiHttp from 'chai-http';
 import path from 'path';
 
 import { runSqlFile, SERVER_URL } from 'test/util';
-import { getClient } from 'src/db/connect';
+import { getClient } from 'src/db/raw';
 import format from 'pg-format';
 import { Neighbour } from 'src/types';
 

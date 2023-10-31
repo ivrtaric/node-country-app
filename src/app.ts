@@ -3,7 +3,7 @@ import env from 'src/env';
 import { router } from 'src/api/routes';
 import { errorHandler } from 'src/api/middleware/error-handler';
 import { getWorkerPool } from 'src/application/calculations/worker-pool';
-import { getClient } from 'src/db/connect';
+import { getClient } from 'src/db';
 import { Logger } from 'src/util/logger';
 
 const logger = new Logger('app');
