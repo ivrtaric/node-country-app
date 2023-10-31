@@ -17,5 +17,17 @@ export const connectPool = async () => {
 
 const getConnectionDetails = async () => {
 	// await getConfigurationFromRemoteStorage()
-	return env.DB_CONFIG;
+	if (env.DB_CONFIG) {
+		logger.debug('Using env.DB_CONFIG');
+		return env.DB_CONFIG;
+	} else if (env.DB_HOST) {
+		logger.debug('Using env.DB_HOST/DB_PORT/DB_USER/DB_PASSWORD/DB_NAME');
+		return {
+			host: env.DB_HOST,
+			port: env.DB_PORT,
+			user: env.DB_USER,
+			password: env.DB_PASSWORD,
+			database: env.DB_NAME
+		};
+	} else throw new Error('Database connection information not provided');
 };

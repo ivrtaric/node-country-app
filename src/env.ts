@@ -21,8 +21,14 @@ const env = cleanEnv(
 
 		LOG_LEVEL: str({ choices: ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR'], default: 'INFO' }),
 
-		DB_CONFIG: json({ desc: 'Additional email parameters' }),
+		DB_CONFIG: json({ desc: 'Additional email parameters', default: null }),
 		DB_POOL_SIZE: num({ default: 5 }),
+
+		DB_HOST: str({ default: 'localhost' }),
+		DB_PORT: num({ default: 5432 }),
+		DB_USER: str({ default: 'postgres' }),
+		DB_PASSWORD: str({ default: 'postgres' }),
+		DB_NAME: str({ default: 'countryapp' }),
 
 		NODE_ENV: str({ choices: ['development', 'test', 'production', 'staging'], default: 'production' }),
 		WORKERS: num({ default: os.cpus().length })
