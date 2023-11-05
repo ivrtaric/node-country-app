@@ -6,10 +6,10 @@ export const addNeighbours = async (req: Request, res: Response) => {
 	const countryId = validateCountryId(req);
 	const neighboursData = validateAddNeighboursData(req);
 
-	const response = await appAddNeighbours(countryId, neighboursData);
+	await appAddNeighbours(countryId, neighboursData);
 
 	res.status(201).json({
-		message: `Neighbours added successfully: ${response?.map(n => n.neighbour_id)?.join(', ')}`
+		message: `Neighbours added successfully.`
 	});
 };
 
@@ -20,6 +20,6 @@ export const removeNeighbour = async (req: Request, res: Response) => {
 	const response = await appRemoveNeighbour(countryId, neighbourId);
 
 	res.json({
-		message: `Neighbour with ID ${response[0]?.neighbour_id} has been removed successfully`
+		message: `Neighbour with ID ${response[0]?.neighbour_id} has been removed successfully.`
 	});
 };

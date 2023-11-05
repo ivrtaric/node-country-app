@@ -30,7 +30,7 @@ describe('Neighbours', () => {
 			expect(res.status).to.equal(201);
 			expect(res.body).to.be.an('object');
 			expect(res.body).to.deep.equal({
-				message: 'Neighbours added successfully: 3, 4'
+				message: 'Neighbours added successfully.'
 			});
 
 			const neighbours = await getNeighbours(1);
@@ -121,7 +121,7 @@ describe('Neighbours', () => {
 			expect(res.status).to.equal(200);
 			expect(res.body).to.be.an('object');
 			expect(res.body).to.deep.equal({
-				message: 'Neighbour with ID 2 has been removed successfully'
+				message: 'Neighbour with ID 2 has been removed successfully.'
 			});
 
 			const neighboursAfter = await getNeighbours(1);

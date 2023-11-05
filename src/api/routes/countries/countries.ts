@@ -56,5 +56,5 @@ export const deleteCountry = async (req: Request, res: Response) => {
 
 	const country = await appDeleteCountry(countryId);
 
-	res.json(country);
+	res.json({ message: `Country with ID ${country.id} has been deleted successfully.` });
 };

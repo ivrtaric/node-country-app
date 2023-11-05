@@ -33,5 +33,5 @@ export const deleteCountry = async (countryId: number) => {
 		throw new NotFoundError('Country', { id: countryId });
 	}
 
-	return { message: `Successfully deleted Country ${JSON.stringify({ id: countryId })}` };
+	return results[0];
 };
