@@ -21,7 +21,7 @@ const env = cleanEnv(
 
 		LOG_LEVEL: str({ choices: ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR'], default: 'INFO' }),
 
-		DB_CONFIG: json({ desc: 'Additional email parameters', default: null }),
+		DB_CONFIG: json({ desc: 'Database connection parameters', default: null }),
 		DB_POOL_SIZE: num({ default: 5 }),
 
 		DB_HOST: str({ default: 'localhost' }),

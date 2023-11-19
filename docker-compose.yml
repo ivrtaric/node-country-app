@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:14.5
+    container_name: ${CONTAINER_NAME}-db
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - ${DB_PORT}:5432
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      FIXTURE_DIR: /docker-entrypoint-initdb.d
+    volumes:
+      - ./test/fixtures/init:/docker-entrypoint-initdb.d

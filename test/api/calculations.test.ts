@@ -9,7 +9,7 @@ chai.use(chaiHttp);
 
 describe('Neighbours', () => {
 	before(async () => {
-		await runSqlFile(path.join(__dirname, '..', 'fixtures', 'create-db-init.sql'));
+		await runSqlFile(path.join(__dirname, '..', 'fixtures', 'init', 'create-db-init.sql'));
 	});
 
 	describe('GET /calculate/optimal-route', () => {

@@ -22,8 +22,8 @@ CREATE TABLE neighbours (
 CREATE TEMP TABLE temp_neighbours (country_code VARCHAR(20), country_name VARCHAR(255), neighbour_code VARCHAR(20), neighbour_name VARCHAR(255));
 
 \! pwd
-COPY country(name, code, code_alpha_2, code_alpha_3, flag) FROM '/fixtures/countries.csv' DELIMITER ',' CSV HEADER;
-COPY temp_neighbours(country_code, country_name, neighbour_code, neighbour_name) FROM '/fixtures/country_neighbours.csv' DELIMITER ',' CSV HEADER;
+COPY country(name, code, code_alpha_2, code_alpha_3, flag) FROM '/docker-entrypoint-initdb.d/countries.csv' DELIMITER ',' CSV HEADER;
+COPY temp_neighbours(country_code, country_name, neighbour_code, neighbour_name) FROM '/docker-entrypoint-initdb.d/country_neighbours.csv' DELIMITER ',' CSV HEADER;
 
 INSERT INTO neighbours (country_id, neighbour_id)
 SELECT c.id AS country_id, n.id AS neighbour_id

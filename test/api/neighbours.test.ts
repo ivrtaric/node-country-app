@@ -12,7 +12,7 @@ chai.use(chaiHttp);
 describe('Neighbours', () => {
 	before(async () => {
 		await runSqlFile(path.join(__dirname, '..', '..', 'src', 'db', 'schema', '00-schema.sql'));
-		await runSqlFile(path.join(__dirname, '..', 'fixtures', 'db-data-neighbours-api.sql'));
+		await runSqlFile(path.join(__dirname, '..', 'fixtures', 'test', 'db-data-neighbours-api.sql'));
 	});
 
 	describe('POST /countries/:id/neighbours', () => {

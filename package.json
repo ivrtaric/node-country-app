@@ -4,9 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "db:init": "npx dotenv -e ./.env.local -- docker compose -f ./docker-compose.yml up -d",
+    "db:remove": "npx dotenv -e ./.env.local -- docker compose -f ./docker-compose.yml down && docker volume prune -f --filter all=1",
     "build": "docker build -t notch-bootcamp/country-app-node --build-arg port=3003 .",
     "start": "npx ts-node --transpile-only ./src/index.ts",
-    "start:local": "NODE_ENV=development npx ts-node ./src/index.ts",
+    "start:local:run": "NODE_ENV=development npx ts-node ./src/index.ts",
+    "start:local": "npm run db:init && npm run start:local:run",
     "lint": "npx eslint . --ext .ts",
     "test:integration": "npm run pretest && npm run test:integration:run ; npm run posttest",
     "pretest": "npx dotenv -e ./.env.test -- docker compose -f ./test/compose.yml up -d",

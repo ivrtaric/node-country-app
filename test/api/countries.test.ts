@@ -13,7 +13,7 @@ chai.use(chaiHttp);
 describe('Countries', () => {
 	before(async () => {
 		await runSqlFile(path.join(__dirname, '..', '..', 'src', 'db', 'schema', '00-schema.sql'));
-		await runSqlFile(path.join(__dirname, '..', 'fixtures', 'db-data-country-api.sql'));
+		await runSqlFile(path.join(__dirname, '..', 'fixtures', 'test', 'db-data-country-api.sql'));
 	});
 
 	describe('GET /countries', () => {
